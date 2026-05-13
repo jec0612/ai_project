@@ -1,1 +1,196 @@
+import streamlit as st
 
+# MBTI별 추천 데이터
+mbti_data = {
+    "ISTJ": {
+        "books": [
+            {
+                "title": "미움받을 용기",
+                "personality": "현실적이고 책임감이 강한 사람",
+                "story": "자신만의 삶을 살아가는 방법과 인간관계에 대한 철학을 담은 책"
+            },
+            {
+                "title": "데미안",
+                "personality": "원칙을 중요하게 생각하며 깊이 고민하는 사람",
+                "story": "자아를 찾아 성장해가는 소년의 이야기"
+            }
+        ],
+        "movies": [
+            {
+                "title": "인터스텔라",
+                "personality": "논리적이고 계획적인 사람",
+                "story": "인류의 미래를 위해 우주로 떠나는 탐험 이야기"
+            },
+            {
+                "title": "포레스트 검프",
+                "personality": "성실하고 묵묵히 자신의 길을 가는 사람",
+                "story": "순수한 한 남자의 인생 여정을 담은 영화"
+            }
+        ]
+    },
+
+    "ISFJ": {
+        "books": [
+            {
+                "title": "아몬드",
+                "personality": "따뜻하고 공감 능력이 좋은 사람",
+                "story": "감정을 잘 느끼지 못하는 소년이 성장하며 변해가는 이야기"
+            },
+            {
+                "title": "완득이",
+                "personality": "배려심이 많고 주변 사람을 잘 챙기는 사람",
+                "story": "평범하지 않은 환경 속에서 성장하는 학생 이야기"
+            }
+        ],
+        "movies": [
+            {
+                "title": "코코",
+                "personality": "가족을 소중히 여기는 사람",
+                "story": "음악을 사랑하는 소년이 죽은 자들의 세계로 떠나는 이야기"
+            },
+            {
+                "title": "인사이드 아웃",
+                "personality": "감정 표현이 섬세한 사람",
+                "story": "머릿속 감정들이 펼치는 성장 이야기"
+            }
+        ]
+    },
+
+    "INFJ": {
+        "books": [
+            {
+                "title": "어린 왕자",
+                "personality": "감수성이 풍부하고 깊은 생각을 하는 사람",
+                "story": "순수함과 인간관계의 의미를 담은 이야기"
+            },
+            {
+                "title": "나미야 잡화점의 기적",
+                "personality": "타인의 고민에 공감하는 사람",
+                "story": "편지를 통해 사람들의 고민을 해결해주는 이야기"
+            }
+        ],
+        "movies": [
+            {
+                "title": "죽은 시인의 사회",
+                "personality": "이상적이고 꿈을 중요하게 생각하는 사람",
+                "story": "학생들에게 진정한 삶의 의미를 알려주는 선생님의 이야기"
+            },
+            {
+                "title": "소울",
+                "personality": "삶의 의미를 고민하는 사람",
+                "story": "영혼 세계에서 펼쳐지는 인생에 대한 이야기"
+            }
+        ]
+    },
+
+    "INTJ": {
+        "books": [
+            {
+                "title": "사피엔스",
+                "personality": "분석적이고 지적 호기심이 강한 사람",
+                "story": "인류의 역사와 발전 과정을 설명한 책"
+            },
+            {
+                "title": "1984",
+                "personality": "비판적 사고를 잘하는 사람",
+                "story": "감시 사회 속 인간의 자유를 다룬 소설"
+            }
+        ],
+        "movies": [
+            {
+                "title": "인셉션",
+                "personality": "복잡한 사고와 추리를 좋아하는 사람",
+                "story": "꿈속에서 정보를 훔치는 작전 이야기"
+            },
+            {
+                "title": "마션",
+                "personality": "문제 해결 능력이 뛰어난 사람",
+                "story": "화성에 홀로 남겨진 우주인의 생존 이야기"
+            }
+        ]
+    }
+}
+
+# 나머지 MBTI 자동 생성용
+default_books = [
+    {
+        "title": "달러구트 꿈 백화점",
+        "personality": "상상력이 풍부한 사람",
+        "story": "꿈을 사고파는 신비한 백화점 이야기"
+    },
+    {
+        "title": "해리포터",
+        "personality": "모험과 성장을 좋아하는 사람",
+        "story": "마법학교에서 성장하는 소년 이야기"
+    }
+]
+
+default_movies = [
+    {
+        "title": "어바웃 타임",
+        "personality": "감성적이고 인간관계를 중요하게 생각하는 사람",
+        "story": "시간을 되돌릴 수 있는 남자의 사랑 이야기"
+    },
+    {
+        "title": "라라랜드",
+        "personality": "꿈과 열정을 중요하게 생각하는 사람",
+        "story": "꿈을 향해 달려가는 청춘들의 이야기"
+    }
+]
+
+# 빠진 MBTI 자동 추가
+all_mbti = [
+    "ISTJ", "ISFJ", "INFJ", "INTJ",
+    "ISTP", "ISFP", "INFP", "INTP",
+    "ESTP", "ESFP", "ENFP", "ENTP",
+    "ESTJ", "ESFJ", "ENFJ", "ENTJ"
+]
+
+for mbti in all_mbti:
+    if mbti not in mbti_data:
+        mbti_data[mbti] = {
+            "books": default_books,
+            "movies": default_movies
+        }
+
+# 페이지 설정
+st.set_page_config(
+    page_title="MBTI 책 & 영화 추천",
+    page_icon="📚",
+    layout="centered"
+)
+
+# 제목
+st.title("📚 MBTI별 책 & 영화 추천")
+st.write("MBTI를 선택하면 어울리는 책과 영화를 추천해드립니다!")
+
+# MBTI 선택
+selected_mbti = st.selectbox(
+    "MBTI를 선택하세요",
+    all_mbti
+)
+
+# 버튼
+if st.button("추천 보기"):
+
+    st.header(f"✨ {selected_mbti} 추천 결과")
+
+    # 책 추천
+    st.subheader("📖 추천 책 2가지")
+
+    for idx, book in enumerate(mbti_data[selected_mbti]["books"], start=1):
+        st.markdown(f"### {idx}. {book['title']}")
+        st.write(f"👤 어울리는 성격: {book['personality']}")
+        st.write(f"📝 줄거리: {book['story']}")
+        st.divider()
+
+    # 영화 추천
+    st.subheader("🎬 추천 영화 2가지")
+
+    for idx, movie in enumerate(mbti_data[selected_mbti]["movies"], start=1):
+        st.markdown(f"### {idx}. {movie['title']}")
+        st.write(f"👤 어울리는 성격: {movie['personality']}")
+        st.write(f"📝 줄거리: {movie['story']}")
+        st.divider()
+
+st.caption("※ 추천은 MBTI 성향을 바탕으로 한 참고용입니다.")
