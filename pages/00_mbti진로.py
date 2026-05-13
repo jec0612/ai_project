@@ -1,4 +1,3 @@
-```python
 import streamlit as st
 
 # MBTI별 진로 데이터
