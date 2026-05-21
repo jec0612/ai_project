@@ -4,3 +4,6 @@ streamlit
 pandas
 plotly
 folium
+streamlit
+pandas
+matplotlib
