@@ -1,59 +1,69 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
+import plotly.graph_objects as go
+import plotly.express as px
 
-# -----------------------------
-# 한글 폰트 설정
-# -----------------------------
-plt.rcParams['font.family'] = 'Malgun Gothic'
-plt.rcParams['axes.unicode_minus'] = False
-
-# -----------------------------
-# 데이터 불러오기
-# -----------------------------
-df = pd.read_csv("population.csv", encoding="cp949")
-
-# 숫자 변환 함수
-def to_num(x):
-    return int(str(x).replace(",", ""))
-
-# 총인구수 컬럼 숫자 변환
-df["2026년04월_거주자_총인구수"] = df["2026년04월_거주자_총인구수"].apply(to_num)
-
-# 행정구 목록
-districts = df["행정구역"].tolist()
-
-# -----------------------------
-# Streamlit UI
-# -----------------------------
-st.title("서울시 행정구별 인구수")
-
-selected = st.selectbox(
-    "행정구를 선택하세요",
-    districts
+# ==================================================
+# 페이지 설정
+# ==================================================
+st.set_page_config(
+    page_title="서울시 행정구별 인구수",
+    layout="wide"
 )
 
-# 선택된 구 데이터
-row = df[df["행정구역"] == selected].iloc[0]
+st.title("🏙️ 서울시 행정구별 인구수 분석")
 
+# ==================================================
+# 데이터 로드
+# ==================================================
+@st.cache_data
+def load_data():
+
+    encodings = [
+        "cp949",
+        "euc-kr",
+        "utf-8-sig",
+        "utf-8"
+    ]
+
+    for enc in encodings:
+        try:
+            return pd.read_csv(
+                "population.csv",
+                encoding=enc
+            )
+        except:
+            pass
+
+    raise Exception("population.csv 파일을 읽을 수 없습니다.")
+
+df = load_data()
+
+# ==================================================
+# 첫 번째 컬럼 = 행정구
+# ==================================================
+region_col = df.columns[0]
+
+# ==================================================
+# 숫자형 변환
+# ==================================================
+for col in df.columns[1:]:
+
+    df[col] = (
+        df[col]
+        .astype(str)
+        .str.replace(",", "", regex=False)
+    )
+
+    df[col] = pd.to_numeric(
+        df[col],
+        errors="coerce"
+    )
+
+# ==================================================
 # 연령대 컬럼
-age_columns = [
-    "2026년04월_거주자_0~9세",
-    "2026년04월_거주자_10~19세",
-    "2026년04월_거주자_20~29세",
-    "2026년04월_거주자_30~39세",
-    "2026년04월_거주자_40~49세",
-    "2026년04월_거주자_50~59세",
-    "2026년04월_거주자_60~69세",
-    "2026년04월_거주자_70~79세",
-    "2026년04월_거주자_80~89세",
-    "2026년04월_거주자_90~99세",
-    "2026년04월_거주자_100세 이상"
-]
-
-# 나이 라벨
-ages = [
+# ==================================================
+age_cols = [
     "0~9세",
     "10~19세",
     "20~29세",
@@ -67,34 +77,144 @@ ages = [
     "100세 이상"
 ]
 
-# 인구수 데이터
-population = [to_num(row[col]) for col in age_columns]
+# 실제 존재하는 컬럼만 사용
+age_cols = [
+    col for col in age_cols
+    if col in df.columns
+]
 
-# -----------------------------
-# 그래프 그리기
-# -----------------------------
-fig, ax = plt.subplots(figsize=(10, 5))
+# ==================================================
+# 서울특별시 행 제거
+# ==================================================
+district_df = df[
+    df[region_col] != "서울특별시"
+].copy()
 
-# 회색 배경
-fig.patch.set_facecolor("lightgray")
-ax.set_facecolor("lightgray")
+# ==================================================
+# 1. 행정구 선택 그래프
+# ==================================================
+st.subheader("📈 행정구 연령대별 인구")
 
-# 빨간색 꺾은선 그래프
-ax.plot(
-    ages,
-    population,
-    color="red",
-    marker="o",
-    linewidth=3
+district = st.selectbox(
+    "행정구 선택",
+    district_df[region_col].tolist()
 )
 
-# 제목 및 축
-ax.set_title("서울시 행정구별 인구수", fontsize=18)
-ax.set_xlabel("나이")
-ax.set_ylabel("인구수")
+selected = district_df[
+    district_df[region_col] == district
+].iloc[0]
 
-# 격자
-ax.grid(True)
+fig1 = go.Figure()
 
-# Streamlit 출력
-st.pyplot(fig)
+fig1.add_trace(
+    go.Scatter(
+        x=age_cols,
+        y=[selected[col] for col in age_cols],
+        mode="lines+markers",
+        line=dict(
+            color="#2F6F4F",
+            width=4
+        ),
+        marker=dict(size=8)
+    )
+)
+
+fig1.update_layout(
+    title=f"{district} 연령대별 인구",
+    paper_bgcolor="#E8F5E9",
+    plot_bgcolor="#E8F5E9",
+    font=dict(
+        family="Malgun Gothic"
+    ),
+    xaxis_title="연령대",
+    yaxis_title="인구수",
+    height=600
+)
+
+st.plotly_chart(
+    fig1,
+    use_container_width=True
+)
+
+st.divider()
+
+# ==================================================
+# 2. 연령대별 TOP10 행정구
+# ==================================================
+st.subheader("🏆 연령대별 인구 TOP10 행정구")
+
+selected_age = st.selectbox(
+    "연령대 선택",
+    age_cols,
+    key="age_select"
+)
+
+top10 = (
+    district_df[
+        [region_col, selected_age]
+    ]
+    .sort_values(
+        by=selected_age,
+        ascending=False
+    )
+    .head(10)
+)
+
+# 그래프용 정렬
+top10_graph = top10.sort_values(
+    by=selected_age,
+    ascending=True
+)
+
+fig2 = px.bar(
+    top10_graph,
+    x=selected_age,
+    y=region_col,
+    orientation="h",
+    color=selected_age,
+    text=selected_age,
+    color_continuous_scale="Tealgrn"
+)
+
+fig2.update_traces(
+    texttemplate="%{text:,}",
+    textposition="outside"
+)
+
+fig2.update_layout(
+    title=f"{selected_age} 인구 상위 10개 행정구",
+    paper_bgcolor="#E8F5E9",
+    plot_bgcolor="#E8F5E9",
+    font=dict(
+        family="Malgun Gothic"
+    ),
+    xaxis_title="인구수",
+    yaxis_title="행정구",
+    height=700,
+    coloraxis_showscale=False
+)
+
+st.plotly_chart(
+    fig2,
+    use_container_width=True
+)
+
+# ==================================================
+# TOP10 표
+# ==================================================
+st.subheader("📋 TOP10 행정구 데이터")
+
+st.dataframe(
+    top10,
+    use_container_width=True
+)
+
+# ==================================================
+# 전체 데이터 보기
+# ==================================================
+with st.expander("전체 데이터 보기"):
+    st.dataframe(
+        district_df,
+        use_container_width=True
+    )
+
