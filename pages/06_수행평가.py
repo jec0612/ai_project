@@ -95,31 +95,34 @@ st.markdown('''
 ''')
 
 # -----------------------------
-# 월별 평균기온 계산
+# 날짜별 기온 그래프 데이터
 # -----------------------------
-monthly_temp = df.groupby('월')['평균기온(℃)'].mean().reset_index()
+# 날짜순 정렬
+df = df.sort_values('날짜')
 
 # -----------------------------
 # 그래프 출력
 # -----------------------------
-st.subheader('📈 월별 평균 기온 그래프')
+st.subheader('📈 날짜별 평균 기온 그래프')
 
 # 한글 설정
 plt.rcParams['font.family'] = 'Malgun Gothic'
 plt.rcParams['axes.unicode_minus'] = False
 
-fig, ax = plt.subplots(figsize=(10, 5))
+fig, ax = plt.subplots(figsize=(12, 5))
 
 ax.plot(
-    monthly_temp['월'],
-    monthly_temp['평균기온(℃)'],
+    df['날짜'],
+    df['평균기온(℃)'],
     marker='o',
     linewidth=2
 )
 
-ax.set_xlabel('월')
+ax.set_xlabel('날짜')
 ax.set_ylabel('평균기온(℃)')
-ax.set_title('서울 월별 평균 기온')
+ax.set_title('서울 날짜별 평균 기온')
+
+plt.xticks(rotation=45)
 
 st.pyplot(fig)
 
