@@ -4,3 +4,6 @@ plotly
 streamlit
 pandas
 matplotlib
+streamlit
+pandas
+matplotlib
