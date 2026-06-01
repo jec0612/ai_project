@@ -282,29 +282,28 @@ drink_info = {
 }
 
 # -----------------------------
-# 음료 선택 설명
+# 클릭형 음료 설명
 # -----------------------------
 st.subheader('🧋 음료 상세 설명')
 
-selected_drink = st.selectbox(
-    '궁금한 음료를 선택하세요',
-    drinks
-)
+for drink in drinks:
 
-info = drink_info[selected_drink]
+    with st.expander(f'{drink} 설명 보기'):
 
-st.markdown(f'''
-<div style="
-    background-color:#f7f7f7;
-    padding:20px;
-    border-radius:15px;
-    border:2px solid #dddddd;
-">
-    <h3>{selected_drink}</h3>
-    <p><b>🍴 맛:</b> {info['맛']}</p>
-    <p><b>✨ 효과:</b> {info['효과']}</p>
-</div>
-''', unsafe_allow_html=True)
+        info = drink_info[drink]
+
+        st.markdown(f'''
+        <div style="
+            background-color:#f7f7f7;
+            padding:20px;
+            border-radius:15px;
+            border:2px solid #dddddd;
+        ">
+            <h3>{drink}</h3>
+            <p><b>🍴 맛:</b> {info['맛']}</p>
+            <p><b>✨ 효과:</b> {info['효과']}</p>
+        </div>
+        ''', unsafe_allow_html=True)
 
 # -----------------------------
 # 계절 특징
@@ -353,5 +352,4 @@ st.dataframe(df, use_container_width=True)
 # 하단 설명
 # -----------------------------
 st.info('이 프로그램은 기상청 데이터를 활용하여 기온에 따라 어울리는 음료를 추천합니다.')
-
 
