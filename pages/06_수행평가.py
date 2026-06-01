@@ -122,12 +122,54 @@ else:
 # -----------------------------
 st.subheader('✅ 추천 결과')
 
-st.success(f'현재 계절: {season}')
+st.markdown(f'''
+<div style="
+    background-color:#f5f5f5;
+    padding:25px;
+    border-radius:20px;
+    border:2px solid #dcdcdc;
+    text-align:center;
+">
+    <h2>🌤 현재 계절: {season}</h2>
+    <h3>🍹 추천 음료 리스트 🍹</h3>
+</div>
+''', unsafe_allow_html=True)
 
-st.write('### 🍹 추천 음료')
+st.write('')
 
-for drink in drinks:
-    st.write(f'- {drink}')
+col1, col2 = st.columns(2)
+
+for i, drink in enumerate(drinks):
+    if i % 2 == 0:
+        with col1:
+            st.markdown(f'''
+            <div style="
+                background-color:#fff4e6;
+                padding:15px;
+                margin-bottom:10px;
+                border-radius:15px;
+                text-align:center;
+                font-size:20px;
+                font-weight:bold;
+            ">
+                {drink}
+            </div>
+            ''', unsafe_allow_html=True)
+    else:
+        with col2:
+            st.markdown(f'''
+            <div style="
+                background-color:#e8f7ff;
+                padding:15px;
+                margin-bottom:10px;
+                border-radius:15px;
+                text-align:center;
+                font-size:20px;
+                font-weight:bold;
+            ">
+                {drink}
+            </div>
+            ''', unsafe_allow_html=True)
 
 # -----------------------------
 # 계절 특징
@@ -176,3 +218,4 @@ st.dataframe(df, use_container_width=True)
 # 하단 설명
 # -----------------------------
 st.info('이 프로그램은 기상청 데이터를 활용하여 기온에 따라 어울리는 음료를 추천합니다.')
+
