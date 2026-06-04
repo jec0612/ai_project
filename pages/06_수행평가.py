@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-```python id="8cpx2q"
 # -----------------------------
 # 클릭 가능한 추천 음료 박스
 # -----------------------------
